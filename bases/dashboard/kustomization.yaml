@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dashboard
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - bearer-token.yaml
+  - clusterrolebinding.yaml
+  - origintls.yaml
+
+helmCharts:
+- name: kubernetes-dashboard
+  repo: https://kubernetes.github.io/dashboard/
+  version: "7.3.1"
+  releaseName: kubernetes-dashboard
+  namespace: dashboard
+  valuesFile: values.yaml
+

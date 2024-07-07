@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: engine-image-ei-68f17757
+  namespace: longhorn-system
+spec:
+  template:
+    spec:
+      tolerations:
+      - effect: "NoSchedule"
+        operator: "Exists"
+

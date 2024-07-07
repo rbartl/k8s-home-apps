@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: restic-statefulset
+  labels:
+    app: restic-exporter
+spec:
+  serviceName: restic-exporter
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restic-exporter
+  template:
+    metadata:
+      labels:
+        app: restic-exporter
+    spec:
+      containers:
+        - name: restic-exporter
+          image: ngosang/restic-exporter
+          ports:
+            - containerPort: 8001
+              name: http
+              protocol: TCP
+          env:
+          - name: AWS_ACCESS_KEY_ID
+            value: ""
+          - name: AWS_SECRET_ACCESS_KEY
+            value: ""
+          - name: RESTIC_PASSWORD
+            value: ""
+          - name: RESTIC_REPOSITORY
+            value: ""
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            

@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8up
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  destination:
+    namespace: k8up
+    name: in-cluster
+  project: default
+  source:
+    path: kustomize-k8s/bases/k8up
+    repoURL: repourl
+    targetRevision: master
+      

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mosquitto
+  name: mosquitto
+spec:
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      securityContext:
+        fsGroup: 472
+        supplementalGroups:
+          - 0
+      containers:
+        - name: mosquitto
+          image: docker.io/eclipse-mosquitto
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1883
+              name: mqtt
+              protocol: TCP
+            - containerPort: 9001
+              name: http
+              protocol: TCP
+            - containerPort: 8883
+              name: mqtts
+              protocol: TCP
+          env:
+          - name: "GF_RENDERING_SERVER_URL"
+            value: "http://grafana-renderer.grafanahome.svc.cluster.local:8081/render"
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 1883
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 250m
+              memory: 750Mi
+          volumeMounts:
+            - name: password-file
+              mountPath: /mosquitto/config/password_file.txt
+              subPath: password_file.txt
+            - name: mosquitto-data
+              mountPath: /mosquitto/data
+            - name: mosquitto-log
+              mountPath: /mosquitto/log
+            - name: config-file
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf    
+                        
+      volumes:
+        - name: config-file
+          configMap:
+            name: mosquitto-config
+        - name: password-file
+          configMap:
+           name: mosquitto-password        
+        - name: mosquitto-data
+          emptyDir: {}
+        - name: mosquitto-log
+          emptyDir: {}   
+        

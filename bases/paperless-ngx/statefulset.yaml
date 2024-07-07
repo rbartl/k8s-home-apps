@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: paperless
+spec:
+  selector:
+    matchLabels:
+      app: paperless
+  serviceName: paperless
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: paperless
+    spec:
+      containers:
+      - name: paperless
+        image: ghcr.io/paperless-ngx/paperless-ngx:2.10.1
+        env:
+        - name: PAPERLESS_PORT
+          value: "8080"
+        - name: PAPERLESS_REDIS
+          value: "redis://redis-0.redis.paperless.svc.cluster.local:6379"
+        - name: PAPERLESS_DBHOST
+          value: ""
+        - name: PAPERLESS_SECRET_KEY
+          value: ""
+        - name: PAPERLESS_TIME_ZONE
+          value: "Europe/Vienna"
+        - name: PAPERLESS_OCR_USER_ARGS
+          value : '{"invalidate_digital_signatures": true}'
+        - name: PAPERLESS_OCR_LANGUAGES
+          value: "deu"
+        - name: PAPERLESS_OCR_LANGUAGE
+          value: "deu"
+#        - name: PAPERLESS_CONSUMER_ENABLE_BARCODES
+#          value: "true"
+        - name: PAPERLESS_CONSUMER_BARCODE_SCANNER
+          value: "ZXING"
+        - name: PAPERLESS_ADMIN_USER
+          value: "admin"
+        - name: PAPERLESS_ADMIN_PASSWORD
+          value: ""
+        - name: PAPERLESS_URL
+          value: ""
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - mountPath: /usr/src/paperlessold/data
+          name: paperlessdata
+          subPath: data
+        - mountPath: /usr/src/paperlessold/test
+          name: paperlessdata
+          subPath: test
+        - mountPath: /usr/src/paperlessold/media
+          name: paperlessdata
+          subPath: media
+        - mountPath: /usr/src/paperlessold/export
+          name: paperlessdata
+          subPath: paperlessng_export
+        - mountPath: /usr/src/paperlessold/consume
+          name: paperlessdata
+          subPath: paperlessng_consume
+
+        - mountPath: /usr/src/paperless/data
+          name: paperlessnameddata
+          subPath: data
+        - mountPath: /usr/src/paperless/test
+          name: paperlessnameddata
+          subPath: test
+        - mountPath: /usr/src/paperless/media
+          name: paperlessnameddata
+          subPath: media
+        - mountPath: /usr/src/paperless/export
+          name: paperlessnameddata
+          subPath: paperlessng_export
+        - mountPath: /usr/src/paperless/consume
+          name: paperlessnameddata
+          subPath: paperlessng_consume
+
+
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: http
+#          failureThreshold: 40
+        resources:
+#          limits:
+#            cpu: "1"
+#            memory: "100Mi"        
+          requests:
+            cpu: "1"
+            memory: "500Mi"        
+      volumes:
+      - name: paperlessdata
+        persistentVolumeClaim:
+          claimName: paperless-lhpvc
+      - name: paperlessnameddata
+        persistentVolumeClaim:
+          claimName: paperless-named-lhpvc
+ 

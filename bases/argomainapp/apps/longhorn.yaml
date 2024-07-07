@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+  destination:
+    namespace: argocd
+    name: in-cluster
+  project: default
+  source:
+    path: kustomize-k8s/bases/longhorn
+    repoURL: repourl
+    targetRevision: master
+      

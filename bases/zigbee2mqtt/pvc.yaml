@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zigbee2mqtt-lhpvc
+  annotations:
+    k8up.io/backup: 'true'
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhornscbf
+  volumeName: pvc-zigbee2mqtt-lhpv
+  resources:
+    requests:
+      storage: 200Mi
+      
+

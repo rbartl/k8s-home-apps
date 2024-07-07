@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - crds/k8up.io_archives.yaml  
+  - crds/k8up.io_prebackuppods.yaml  
+  - crds/k8up.io_schedules.yaml
+  - crds/k8up.io_backups.yaml   
+  - crds/k8up.io_prunes.yaml         
+  - crds/k8up.io_snapshots.yaml
+  - crds/k8up.io_checks.yaml    
+  - crds/k8up.io_restores.yaml
+  - namespace.yaml
+  - default-backup-schedule.yaml
+#  - default-secrets.yaml
+  - unifi-backup-schedule.yaml
+#  - unifi-secrets.yaml
+#  - grafanahome-secret.yaml
+  - grafanahome-backup-schedule.yaml
+  - paperless-backup-schedule.yaml
+#  - paperless-secret.yaml
+#  - teslamate-secret.yaml
+  - teslamate-backup-schedule.yaml
+  - homematic-backup-schedule.yaml
+#  - homematic-secret.yaml
+  - zigbee2mqtt-backup-schedule.yaml
+#  - zigbee2mqtt-secret.yaml
+  
+helmCharts:
+- name: k8up
+  repo: https://k8up-io.github.io/k8up
+  version: "4.7.0"
+  releaseName: k8up
+  namespace: k8up
+  valuesFile: values.yaml
+  
+  
+

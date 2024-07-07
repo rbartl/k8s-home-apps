@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql
+spec:
+  selector:
+    matchLabels:
+      app: postgresql
+  serviceName: postgresql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgresql
+      annotations:
+        k8up.io/backupcommand: sh -c 'PGDATABASE=xx PGUSER=xx PGPASSWORD=xx pg_dump --clean'
+        k8up.io/file-extension: ".sql"
+    spec:
+      containers:
+      - name: postgresql
+        image: docker.io/postgres:16
+        args:
+        - "-h 0.0.0.0"
+        env:
+        - name: POSTGRES_USER
+          value: ""
+        - name: POSTGRES_PASSWORD
+          value: ""
+        - name: POSTGRES_DB
+          value: ""
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: teslamate-psql
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1000Mi"
+          requests:
+            cpu: "0.7"
+            memory: "400Mi"        
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "teslamate" -h 127.0.0.1 -p 5432
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - -e
+            - |
+              exec pg_isready -U "teslamate" -h 127.0.0.1 -p 5432
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+      volumes:
+      - name: teslamate-psql
+        persistentVolumeClaim:
+          claimName: teslamate-psql-lhpvc

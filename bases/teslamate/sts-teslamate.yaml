@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: teslamate
+spec:
+  selector:
+    matchLabels:
+      app: teslamate
+  serviceName: teslamate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: teslamate
+    spec:
+      containers:
+      - name: teslamate
+        image: teslamate/teslamate:1.29
+        env:
+        - name: DATABASE_USER
+          value: ""
+        - name: DATABASE_PASS
+          value: ""
+        - name: DATABASE_NAME
+          value: ""
+        - name: DATABASE_HOST
+          value: ""
+        - name: ENCRYPTION_KEY
+          value: ""
+        - name: MQTT_HOST
+          value: ""
+        ports:
+        - containerPort: 4000
+          name: teslamate
+        resources:
+          limits:
+            cpu: "1"
+          requests:
+            cpu: "0.5"
+            memory: "600Mi"        
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /robots.txt
+            port: 4000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 4000
+          timeoutSeconds: 1

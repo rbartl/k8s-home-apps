@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vouch
+  namespace: default
+spec:
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: vouch
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vouch
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+      - name: vouch
+        #image: quay.io/vouch/vouch-proxy:0.39
+        image: voucher/vouch-proxy:latest-arm
+        #image: quay.io/vouch/vouch-proxy
+        env:
+         - name: OAUTH_PROVIDER
+           value: oidc
+         - name: VOUCH_COOKIE_DOMAIN
+           value: ""
+         - name: VOUCH_ALLOWALLUSERS
+           value: "true"
+         - name: OAUTH_CLIENT_ID
+           value: ""
+         - name: OAUTH_CLIENT_SECRET
+           value: ""
+         - name: OAUTH_CALLBACK_URL
+           value: ""
+         - name: OAUTH_AUTH_URL
+           value: ""
+         - name: "OAUTH_TOKEN_URL"
+           value: ""
+         - name: "OAUTH_USER_INFO_URL"
+           value: ""
+         - name: "SESSION_MAXAGE"
+           value: "6000"
+         - name: "COOKIE_MAXAGE"
+           value: "50000"
+         - name: "JWT_MAXAGE"
+           value: "50000"
+         - name: VOUCH_PORT
+           value: "9090"
+        ports:
+        - containerPort: 9090
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: http
+          failureThreshold: 40
+        resources:
+#          limits:
+#            cpu: "1"
+#            memory: "100Mi"        
+          requests:
+            cpu: "0.5"
+            memory: "100Mi"        
+
+#      affinity:
+#        nodeAffinity:
+#          requiredDuringSchedulingIgnoredDuringExecution:
+#            nodeSelectorTerms:
+#            - matchExpressions:
+#              - key: kubernetes.io/arch
+#                operator: In
+#                values:
+#                - arm64
+                

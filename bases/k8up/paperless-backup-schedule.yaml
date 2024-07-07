@@ -1,0 +1,36 @@
+apiVersion: k8up.io/v1
+kind: Schedule
+metadata:
+  name: paperless-backup-schedule
+  namespace: paperless
+spec:
+  backup:
+    schedule: '@daily-random'
+#    schedule: '*/5 * * * *'
+    failedJobsHistoryLimit: 2
+    successfulJobsHistoryLimit: 2
+
+  check:
+    schedule: '0 1 * * 1'
+  prune:
+    schedule: '@daily-random'
+#    schedule: '*/5 * * * *'
+    retention:
+      keepLast: 31
+      keepDaily: 31
+
+
+  backend:
+    repoPasswordSecretRef:
+      name: backup-repo
+      key: password
+    s3:
+      endpoint: http://minio.minio.svc.cluster.local:9000
+      bucket: backup
+      accessKeyIDSecretRef:
+        name: backup-credentials
+        key: username
+      secretAccessKeySecretRef:
+        name: backup-credentials
+        key: password
+

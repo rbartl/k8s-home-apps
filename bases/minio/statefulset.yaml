@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio-statefulset
+  labels:
+    app: minio
+spec:
+  serviceName: minio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k3swork2
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - k3swork2
+      containers:
+        - name: minio-container
+          image: quay.io/minio/minio:RELEASE.2024-01-18T22-51-28Z
+          args:
+            [ "server","/data","--console-address", ":9001"]
+          ports:
+            - containerPort: 9000
+              name: httpapi
+              protocol: TCP
+            - containerPort: 9001
+              name: http
+              protocol: TCP
+          env:
+          - name: MINIO_ROOT_USER
+            value: minioadmin
+          - name: MINIO_ROOT_PASSWORD
+            value: minioadmin
+          volumeMounts:
+            - name: miniodata
+              mountPath: /data
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 9001 
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 400m
+              memory: 500Mi
+      volumes:
+        - name: miniodata
+          hostPath:
+            path: /mnt/minio/data
+            type: Directory
+
+            

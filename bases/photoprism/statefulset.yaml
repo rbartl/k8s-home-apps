@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: photoprism
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: photoprism
+  serviceName: photoprism
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: photoprism
+    spec:
+      containers:
+      - name: photoprism
+        image: photoprism/photoprism:240531-ce
+        env:
+        - name: PHOTOPRISM_DATABASE_DRIVER
+          value: mysql
+        - name: PHOTOPRISM_HTTP_HOST
+          value: "0.0.0.0"
+        - name: PHOTOPRISM_HTTP_PORT
+          value: "2342"
+        - name: PHOTOPRISM_ORIGINALS_LIMIT
+          value: "40000"
+        - name: PHOTOPRISM_SITE_URL
+          value: "https://pp.edv-bartl.at/"
+        # Load database DSN & admin password from secret
+        envFrom:
+        - secretRef:
+            name: photoprism-secrets
+            optional: false
+        ports:
+        - containerPort: 2342
+          name: http
+        volumeMounts:
+        - mountPath: /photoprism/originals
+          name: originals
+#          subPath: media/photos
+#        - mountPath: /assets/cache
+#          name: photoprism
+#          subPath: cache
+        - mountPath: /photoprismold/storage
+          name: photoprism
+          subPath: storage
+        - mountPath: /photoprismold/export
+          name: photoprism
+          subPath: export
+        - mountPath: /photoprism/storage
+          name: photoprismlh
+          subPath: storage
+        - mountPath: /photoprism/export
+          name: photoprismlh
+          subPath: export
+        readinessProbe:
+          httpGet:
+            path: /api/v1/status
+            port: http
+          failureThreshold: 40
+        resources:
+          limits:
+            cpu: "3"
+            memory: "4000Mi"        
+          requests:
+            cpu: "1"
+            memory: "2000Mi"        
+      volumes:
+      - name: originals
+        nfs:
+          path: /export/data/daten/Pics
+#          readOnly: true
+          server: 172.16.149.8
+      - name: photoprism
+        nfs:
+          path: /srv/nfs/photoprism
+          server: 127.0.0.1
+      - name: photoprismlh
+        persistentVolumeClaim:
+          claimName: photoprism-lhpvc
+          
+
+

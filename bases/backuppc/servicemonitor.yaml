@@ -1,0 +1,49 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backuppc
+  labels:
+    app: backuppc
+spec:
+  selector:
+    matchLabels:
+#      app.kubernetes.io/name: backuppc-statefulset
+      app.kubernetes.io/name: backuppc
+#      app: backuppc
+  endpoints:
+    - port: http
+      path: "/BackupPC_Admin"
+      params:
+        action: 
+        - metrics
+        format: 
+        - prometheus
+#      secretBasicAuth: prometheus-scrape-secret
+      basicAuth:
+        password: 
+          name: prometheus-scrape-secret
+          key: password
+        username: 
+          name: prometheus-scrape-secret
+          key: username
+#apiVersion: monitoring.coreos.com/v1
+#kind: ServiceMonitor
+#metadata:
+#  annotations:
+#    kubectl.kubernetes.io/last-applied-configuration: |
+#      {"apiVersion":"monitoring.coreos.com/v1","kind":"ServiceMonitor","metadata":{"annotations":{},"labels":{"release":"prometheus"},"name":"argocd-metrics","namespace":"argocd"},"spec":{"endpoints":[{"port":"metrics"}],"selector":{"matchLabels":{"app.kubernetes.io/name":"argocd-metrics"}}}}
+#  creationTimestamp: "2023-10-12T07:51:09Z"
+#  generation: 1
+#  labels:
+#    release: prometheus
+#  name: argocd-metrics
+#  namespace: argocd
+#  resourceVersion: "218115701"
+#  uid: 8109fe44-19b8-4778-aaa6-f26b3118ab11
+#spec:
+#  endpoints:
+#  - port: metrics
+#  selector:
+#    matchLabels:
+#      app.kubernetes.io/name: argocd-metrics
+##

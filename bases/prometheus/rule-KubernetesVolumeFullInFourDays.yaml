@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kubernetesvolumefullinfourdays
+  namespace: prometheus
+  labels:
+    app: kube-prometheus-stack
+    release: prometheus
+spec:
+  groups:
+    - name: api
+      rules:
+        - alert: KubernetesVolumeFullInFourDays
+          expr: predict_linear(kubelet_volume_stats_available_bytes[6h:5m], 4 * 24 * 3600) < 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Kubernetes Volume full in four days (instance {{ $labels.instance }})
+            description: "Volume under {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is expected to fill up within four days. Currently {{ $value | humanize }}% is available.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+

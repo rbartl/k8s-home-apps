@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: teslamate-psql-lhpvc
+  annotations:
+    k8up.io/backup: 'false'
+# backup is done via pg_dump
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  volumeName: pvc-teslamate-psql-lhpv
+  resources:
+    requests:
+      storage: 5Gi
+      

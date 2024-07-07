@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-influxdb2-lh
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 12Gi
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: longhorn
+  volumeMode: Filesystem

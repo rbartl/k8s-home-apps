@@ -1,0 +1,4 @@
+- op: replace #action 
+  path: /spec/tags #resouirce we want to change
+  value: 
+  - blabla  #value we want to use for patching 

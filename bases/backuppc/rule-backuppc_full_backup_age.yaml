@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: backuppc-backup-age-alert
+  labels:
+    app: kube-prometheus-stack
+    release: prometheus
+spec:
+  groups:
+  - name: backuppc_age_alerts
+    rules:
+    - alert: BackupPCHostsFullAge
+      expr: time() - backuppc_hosts_full_age{container="backuppc-container"} > 3956000
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "BackupPC Host Full Age Exceeded for {{ $labels.host }}"
+        description: "BackupPC host full age exceeded 45 days: {{ $value }} or host {{ $labels.host }}"
+        message: "BackupPC alert for host {{ $labels.host }}. The full backup age has exceeded 45 days."
+
+
+    - alert: BackupPCHostsIncrAge
+      expr: time() - backuppc_hosts_incr_age{container="backuppc-container"} > 259200
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "BackupPC Host Incr Age Exceeded"
+        description: "BackupPC host incr age exceeded 3 days: {{ $value }}"
+

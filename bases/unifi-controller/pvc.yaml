@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unifi-lhpvc
+  annotations:
+    k8up.io/backup: 'true'
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  volumeName: pvc-unifi-lhpv
+  resources:
+    requests:
+      storage: 4Gi
+      

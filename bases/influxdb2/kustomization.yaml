@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: influxdb2
+resources:
+  - namespace.yaml
+
+helmCharts:
+- name: influxdb
+  repo: https://charts.bitnami.com/bitnami
+  version: "6.3.5"
+  releaseName: influxdb
+  namespace: influxdb2
+  valuesFile: values.yaml
+

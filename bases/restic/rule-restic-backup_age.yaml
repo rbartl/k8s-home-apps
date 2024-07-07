@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: restic-backup-age-alert
+  labels:
+    app: kube-prometheus-stack
+    release: prometheus
+spec:
+  groups:
+  - name: restic_backup_rules
+    rules:
+    - alert: restic_BackupTooOld
+      expr: time() - restic_backup_timestamp > 172800
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Backup is older than 2 days"
+        description: "The last backup for {{ $labels.client_hostname }} is older than 2 days."
+

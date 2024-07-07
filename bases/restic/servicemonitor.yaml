@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: restic-exporter
+  labels:
+    app: restic-exporter
+spec:
+  selector:
+    matchLabels:
+#      app.kubernetes.io/name: restic-exporter-statefulset
+      app.kubernetes.io/name: restic-exporter
+#      app: restic-exporter
+  endpoints:
+    - port: http
+      path: "/"
+      params:
+        action: 
+        - metrics
+        format: 
+        - prometheus

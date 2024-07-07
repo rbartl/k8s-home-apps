@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homematic
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  destination:
+    namespace: argocd
+    name: in-cluster
+  project: default
+  source:
+    path: kustomize-k8s/bases/homematic
+    repoURL: ssh://git@gitea.edv-bartl.at:7999/edvbartl/edvbartl-ansible.git
+    targetRevision: master
+      

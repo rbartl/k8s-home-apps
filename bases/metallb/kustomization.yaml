@@ -1,0 +1,9 @@
+# kustomization.yml
+namespace: metallb-system
+
+resources:
+  - https://raw.githubusercontent.com/metallb/metallb/v0.13.5/config/manifests/metallb-native.yaml
+  - ipaddresspool.yaml
+  - l2advertisement.yaml
+  - ipaddresspool-vlan1.yaml
+  - l2advertisement-vlan1.yaml

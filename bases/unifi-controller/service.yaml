@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: unifi-controller
+  namespace: default
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "unifi"
+spec:
+  loadBalancerIP: 172.16.149.35
+#  allocateLoadBalancerNodePorts: true
+#  externalTrafficPolicy: Cluster
+#  internalTrafficPolicy: Cluster
+#  ipFamilies:
+#  - IPv4
+#  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http8080
+    port: 8080
+    protocol: TCP
+    targetPort: http8080
+  - name: http8443
+    port: 8443
+    protocol: TCP
+    targetPort: http8443
+  - name: http8081
+    port: 8081
+    protocol: TCP
+    targetPort: http8081
+  - name: http8843
+    port: 8843
+    protocol: TCP
+    targetPort: http8843
+  - name: http3478
+    port: 3478
+    protocol: TCP
+    targetPort: http3478
+  - name: http8880
+    port: 8880
+    protocol: TCP
+    targetPort: http8880
+  selector:
+    app: unifi-controller
+  type: LoadBalancer

@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: teslamate
+resources:
+  - namespace.yaml
+  - origintls.yaml
+  - sts-grafana.yaml
+  - sts-teslamate.yaml
+  - sts-postgresql.yaml
+  - pv.yaml
+  - pvc.yaml
+  - ingress-grafana.yaml
+  - ingress-teslamate.yaml
+  - service-teslamate.yaml
+  - service-grafana.yaml
+  - service-psql.yaml
+  
+  
+  

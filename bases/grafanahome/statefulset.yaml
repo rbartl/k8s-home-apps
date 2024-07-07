@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: grafana
+  name: grafana
+spec:
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      securityContext:
+        fsGroup: 472
+        supplementalGroups:
+          - 0
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http-grafana
+              protocol: TCP
+          env:
+          - name: "GF_LOG_LEVEL"
+            value: "info"
+          - name: "GF_RENDERING_SERVER_URL"
+            value: "http://grafana-renderer.grafanahome.svc.cluster.local:8081/render"
+          - name: "GF_SERVER_DOMAIN"
+            value: "grafanahome.edv-bartl.at"
+          - name: "GF_RENDERING_CALLBACK_URL"
+            value: "https://grafanahome.edv-bartl.at"
+          - name: "GF_SERVER_ROOT_URL"
+            value: "https://grafanahome.edv-bartl.at"
+          - name: "GF_AUTH_GENERIC_OAUTH_ENABLED"
+            value: "true"
+          - name: "GF_AUTH_GENERIC_OAUTH_NAME"
+            value: "Login Keycloak"
+          - name: "GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP"
+            value: "true"
+          - name: "GF_AUTH_GENERIC_OAUTH_CLIENT_ID"
+            value: "grafanahome.edv-bartl.at"
+          - name: "GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET"
+            value: "Z1nMvBiqOest2J9ZwTUP0btfI0ijIV8N"
+          - name: "GF_AUTH_GENERIC_OAUTH_SCOPES"
+            value: "openid profile email"
+          - name: "GF_AUTH_GENERIC_OAUTH_AUTH_URL"
+            value: "https://kc.edv-bartl.at/realms/master/protocol/openid-connect/auth"
+          - name: "GF_AUTH_GENERIC_OAUTH_TOKEN_URL"
+            value: "https://kc.edv-bartl.at/realms/master/protocol/openid-connect/token"
+          - name: "GF_AUTH_GENERIC_OAUTH_API_URL"
+            value: "https://kc.edv-bartl.at/realms/master/protocol/openid-connect/userinfo"
+          - name: "GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH"
+#            value: "contains(group[*], 'admin') && 'Admin' || contains(group[*], 'editor') && 'Editor' || 'Viewer'"
+            value: "'admin'"
+            
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /robots.txt
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 250m
+              memory: 750Mi
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana-lhpv
+      volumes:
+        - name: grafana-lhpv
+          persistentVolumeClaim:
+            claimName: grafana-lhpvc

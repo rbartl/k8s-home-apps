@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: backuppc-backup-alert
+  labels:
+    app: kube-prometheus-stack
+    release: prometheus
+spec:
+  groups:
+  - name: backuppc_alerts
+    rules:
+    - alert: BackupPCHostsError
+      expr: backuppc_hosts_error{container="backuppc-container"} > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "BackupPC Host Error Detected"
+        description: "Error occurred in BackupPC hosts: {{ $value }}"
+

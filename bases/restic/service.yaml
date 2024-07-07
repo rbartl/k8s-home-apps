@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: restic-exporter
+  labels:
+    app.kubernetes.io/name: restic-exporter
+spec:
+  ports:
+    - port: 8001
+      name: http
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: restic-exporter
+  type: ClusterIP
+  

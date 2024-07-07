@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  labels:
+    app.kubernetes.io/name: minio
+spec:
+  ports:
+    - port: 9001
+      name: http
+      protocol: TCP
+      targetPort: http
+    - port: 9000
+      name: httpapi
+      protocol: TCP
+      targetPort: httpapi
+  selector:
+    app: minio
+  type: ClusterIP
+  

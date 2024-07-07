@@ -1,0 +1,101 @@
+crds:
+  enabled: true
+  
+prometheusOperator:
+  revisionHistoryLimit: 2
+  
+prometheus:
+  prometheusSpec:
+    retention: "5d"
+#    retentionSize: "3GB"
+    scrapeInterval: "120s"
+    resources:
+      requests:
+        memory: 2000Mi
+        cpu: 2
+      limits:
+        memory: 2500Mi
+        cpu: 2
+    storageSpec: 
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn2scbf
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 40Gi
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUseHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+
+#      emptyDir:    
+#        spec:
+#          storageClassName: longhorn
+#          accessModes: ["ReadWriteOnce"]
+#          resources:
+#            requests:
+#              storage: 1Gi
+    
+
+
+grafana:  
+  enabled: false
+
+defaultRules:
+  create: true
+  rules:
+    kubeControllerManager: false
+    kubeProxy: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+#    kubeApiserverAvailability: false
+  disabled:
+    InfoInhibitor: true  
+    KubeAPIDown: true
+    KubeletDown: true
+ 
+server:
+  ## Prometheus data retention period (default if not specified is 15 days)
+  ##
+  retention: "4d"
+  rbac:
+    create: true
+  # List of flags to override default parameters, e.g:
+  # - --enable-feature=agent
+  # - --storage.agent.retention.max-time=30m
+  defaultFlagsOverride: []
+
+  extraFlags:
+    - web.enable-lifecycle
+
+  ingress:
+    ## If true, Prometheus server Ingress will be created
+    ##
+    enabled: false
+
+  ## Server Deployment Strategy type
+  strategy:
+    type: Recreate
+
+
+  service:
+    ## If false, no Service will be created for the Prometheus server
+    ##
+    enabled: true
+    
+
+kubeEtcd:
+  enabled: true
+
+  ## If your etcd is not deployed as a pod, specify IPs it can be found on
+  ##
+  endpoints: 
+   - 172.16.30.14
+   - 172.16.30.15
+  
+  service:
+    enabled: true
+    port: 2381
+    targetPort: 2381  
+        

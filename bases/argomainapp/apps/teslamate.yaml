@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: teslamate
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  destination:
+    namespace: teslamate
+    name: in-cluster
+  project: default
+  source:
+    path: kustomize-k8s/bases/teslamate
+    repoURL: repourl
+    targetRevision: master
+      

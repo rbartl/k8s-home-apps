@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zigbee2mqtt
+spec:
+  selector:
+    matchLabels:
+      app: zigbee2mqtt
+  serviceName: zigbee2mqtt
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zigbee2mqtt
+    spec:
+      nodeSelector:        
+        kubernetes.io/hostname: k3swork4
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - k3swork4
+      containers:
+      - name: zigbee2mqtt
+        securityContext:
+          privileged: true
+        image: koenkk/zigbee2mqtt:1.38.0
+#        command: ["sleep"]
+#        args: ["3000"]
+        env:
+        - name: TZ
+          value: Europe/Berlin
+#        - name: DEBUG
+#          value: "zigbee-herdsman*"
+#        - name: "ZIGBEE2MQTT_DATA"
+#          value: "/data"
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - mountPath: /app/data
+          name: zigbee2mqttdata
+          subPath: data
+        - mountPath: /dev/ttyUSB0
+          name: ttyusb
+        - mountPath: /run/udev
+          name: udev
+          readOnly: true
+      
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: http
+#          failureThreshold: 40
+        resources:
+#          limits:
+#            cpu: "1"
+#            memory: "100Mi"        
+          requests:
+            cpu: "0.2"
+            memory: "400Mi"        
+      volumes:
+      - name: zigbee2mqttdata
+        persistentVolumeClaim:
+          claimName: zigbee2mqtt-lhpvc
+      - name: ttyusb
+        hostPath:
+          path: /dev/ttyUSB0
+      - name: udev
+        hostPath:
+          path: /run/udev
+      

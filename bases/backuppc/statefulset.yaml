@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: backuppc-statefulset
+  labels:
+    app: backuppc
+spec:
+  serviceName: backuppc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backuppc
+  template:
+    metadata:
+      labels:
+        app: backuppc
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k3swork2
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - k3swork2
+      containers:
+        - name: backuppc-container
+          image: adferrand/backuppc
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+          - name: SMTP_HOST
+            value: aspmx.l.google.com
+          - name: SMTP_MAIL_DOMAIN
+            value: edv-bartl.at
+          
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/backuppc/
+            - name: backuppc-volume
+              mountPath: /data/backuppc/
+            - name: home-volume
+              mountPath: /home/backuppc/
+            - name: msmtprc
+              mountPath: /etc/msmtprc
+              readOnly: true
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 8080 
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 1500Mi
+      volumes:
+        - name: config-volume
+          hostPath:
+            path: /mnt/backuppc/backuppc_config
+            type: Directory
+        - name: home-volume
+          hostPath:
+            path: /mnt/backuppc/backuppc_home
+            type: Directory
+        - name: backuppc-volume
+          hostPath:
+            path: /mnt/backuppc/backuppc_pool
+            type: Directory
+        - name: msmtprc
+          hostPath:
+            path: /mnt/backuppc/msmtprc
+            type: File
+
+            

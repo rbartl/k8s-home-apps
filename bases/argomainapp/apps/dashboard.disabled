@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dashboard
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  destination:
+    namespace: dashboard
+    name: in-cluster
+  project: default
+  source:
+    path: kustomize-k8s/bases/dashboard
+    repoURL: ssh://git@gitea.edv-bartl.at:7999/edvbartl/edvbartl-ansible.git
+    targetRevision: master
+      

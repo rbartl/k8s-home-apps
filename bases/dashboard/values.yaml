@@ -1,0 +1,24 @@
+app:
+  mode: 'dashboard'
+  ingress:
+    enabled: true
+    hosts:
+      - k3s.edv-bartl.at
+    ingressClassName: nginx
+    tls:
+      secretName: "origintls" 
+
+auth:
+  scaling:
+    revisionHistoryLimit: 2
+api:
+  scaling:
+    revisionHistoryLimit: 2
+web:
+  scaling:
+    revisionHistoryLimit: 2
+metricsScraper:
+  enabled: false
+  scaling:
+    revisionHistoryLimit: 2
+          
